@@ -2,19 +2,12 @@
 #SBATCH --job-name=ofa-single    # create a short name for your job
 #SBATCH --partition gpu          # request a specific partition for the resource allocation.
 #SBATCH --nodes=1                # node count
-#SBATCH --ntasks-per-node=3      # total number of tasks per node
-#SBATCH --gres=gpu:rtx3090:3     # number of gpus per node with specified GPU tpyes
+#SBATCH --ntasks-per-node=1      # total number of tasks per node
+#SBATCH --gres=gpu:rtx3090:1     # number of gpus per node with specified GPU tpyes
 #SBATCH --cpus-per-task=3        # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem=32G                # total memory per node (4 GB per cpu-core is default)
 #SBATCH --time=12:00:00          # total run time limit (HH:MM:SS)
-#SBATCH --output=ofa_ddp.out.txt
-
-export MASTER_PORT=$(expr 10000 + $(echo -n $SLURM_JOBID | tail -c 4))
-export WORLD_SIZE=$(($SLURM_JOB_NUM_NODES * $SLURM_NTASKS_PER_NODE))
-master_addr=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
-export MASTER_ADDR=$master_addr
-export CUDA_VISIBLE_DEVICES=0,1,2
-export GPUS_PER_NODE=$SLURM_NTASKS_PER_NODE
+#SBATCH --output=ofa_single.out.txt
 
 source ~/.bashrc
 enable_modules
@@ -31,7 +24,7 @@ result_path=../../results/caption
 selected_cols=1,4,2
 split='test'
 
-python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_port=${MASTER_PORT} ../../evaluate.py \
+CUDA_VISIBLE_DEVICES=0 python3 ../../evaluate.py \
     ${data} \
     --path=${path} \
     --user-dir=${user_dir} \
