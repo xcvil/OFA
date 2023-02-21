@@ -1,10 +1,20 @@
-#!/usr/bin/env
+#!/usr/bin/env bash
+# SBATCH  --mail-type=ALL                      # mail configuration: NONE, BEGIN, END, FAIL, REQUEUE, ALL
+# SBATCH  --output=pretrain_output/%j.out      # where to store the output ( %j is the JOBID )
+# SBATCH --gres=gpu:geforce_rtx_3090:2         # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti
+# SBATCH --cpus-per-task=30
+# SBATCH --mem=240G
+
+# /bin/echo Running on host: `hostname`
+# /bin/echo In directory: `pwd`
+# /bin/echo Starting on: `date`
+# /bin/echo SLURM_JOB_ID: $SLURM_JOB_ID
 
 # The port for communication. Note that if you want to run multiple tasks on the same machine,
 # you need to specify different port numbers.
-export MASTER_PORT=1052
-export CUDA_VISIBLE_DEVICES=0
-export GPUS_PER_NODE=1
+export MASTER_PORT=1033
+export CUDA_VISIBLE_DEVICES=0,1
+export GPUS_PER_NODE=2
 
 bpe_dir=../../utils/BPE
 user_dir=../../ofa_module
@@ -31,7 +41,7 @@ label_smoothing=0.0
 lr=1e-4
 max_epoch=50
 warmup_ratio=0.01
-batch_size=4
+batch_size=2
 update_freq=1
 resnet_drop_path_rate=0.0
 encoder_drop_path_rate=0.1
@@ -102,4 +112,5 @@ python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_p
   --max-image-size=${max_image_size} \
   --fp16 \
   --fp16-scale-window=128 \
-  --num-workers=0
+  --num-workers=0 \
+  --ddp-backend=no_c10d
