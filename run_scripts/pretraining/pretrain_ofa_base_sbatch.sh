@@ -1,16 +1,30 @@
-#!/usr/bin/env
+#!/bin/bash
+#SBATCH --mail-type=FAIL                # mail configuration: NONE, BEGIN, END, FAIL, REQUEUE, ALL
+#SBATCH --output=output/%j.out
+#SBATCH --error=log/%j.err
+#SBATCH --job-name=ofa-ddp              # create a short name for your job
+#SBATCH --nodes=1                       # node count
+#SBATCH --ntasks-per-node=3             # total number of tasks per node
+#SBATCH --gres=gpu:geforce_rtx_3090:3   # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti
+#SBATCH --cpus-per-task=3               # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --mem-per-cpu=16G               # total memory per node (4 GB per cpu-core is default)
+#SBATCH --time=48:00:00                 # total run time limit (HH:MM:SS)
+
+# Exit on errors
+set -o errexit
+
+source ~/.bashrc.xzheng
+conda activate med
 
 # The port for communication. Note that if you want to run multiple tasks on the same machine,
 # you need to specify different port numbers.
-export MASTER_PORT=1066
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-export GPUS_PER_NODE=4
+export MASTER_PORT=8088
+export CUDA_VISIBLE_DEVICES=0,1,2,
+export GPUS_PER_NODE=3
 
 bpe_dir=../../utils/BPE
 user_dir=../../ofa_module
-
 restore_file=../../checkpoints/ofa_base.pt
-
 data_dir=../../dataset/pretrain_data
 neg_sample_dir=${data_dir}/negative_sample
 data=${data_dir}/vision_language_examples.tsv
@@ -104,3 +118,9 @@ python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_p
   --fp16-scale-window=128 \
   --num-workers=0 \
   --ddp-backend=no_c10d \
+
+# Send more noteworthy information to the output log
+echo "Finished at:     $(date)"
+
+# End the script with exit code 0
+exit 0
