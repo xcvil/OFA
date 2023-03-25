@@ -3,17 +3,15 @@
 # The port for communication. Note that if you want to run multiple tasks on the same machine,
 # you need to specify different port numbers.
 export MASTER_PORT=1066
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-export GPUS_PER_NODE=4
+export CUDA_VISIBLE_DEVICES=0,1,
+export GPUS_PER_NODE=2
 
 bpe_dir=../../utils/BPE
 user_dir=../../ofa_module
-
 restore_file=../../checkpoints/ofa_base.pt
-
-data_dir=../../dataset/pretrain_data
+data_dir=../../dataset/pretrain_data_rad
 neg_sample_dir=${data_dir}/negative_sample
-data=${data_dir}/vision_language_examples.tsv
+data=${data_dir}/vision_language_examples_new.tsv
 text_data=${data_dir}/text_examples.tsv
 image_data=${data_dir}/image_examples.tsv
 detection_data=${data_dir}/detection_examples.tsv
@@ -31,7 +29,7 @@ label_smoothing=0.0
 lr=1e-4
 max_epoch=50
 warmup_ratio=0.01
-batch_size=2
+batch_size=32
 update_freq=1
 resnet_drop_path_rate=0.0
 encoder_drop_path_rate=0.1
@@ -50,11 +48,9 @@ save_path=./checkpoints
 python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_port=${MASTER_PORT} ../../train.py \
   $data \
   --text-data=${text_data} \
-  --image-data=${image_data} \
   --detection-data=${detection_data} \
   --selected-cols=${selected_cols} \
   --text-selected-cols=${text_selected_cols} \
-  --image-selected-cols=${image_selected_cols} \
   --detection-selected-cols=${detection_selected_cols} \
   --bpe-dir=${bpe_dir} \
   --user-dir=${user_dir} \

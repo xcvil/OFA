@@ -4,10 +4,10 @@
 #SBATCH --error=log/%j.err
 #SBATCH --job-name=ofa-ddp              # create a short name for your job
 #SBATCH --nodes=1                       # node count
-#SBATCH --ntasks-per-node=3             # total number of tasks per node
-#SBATCH --gres=gpu:geforce_rtx_3090:3   # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti
+#SBATCH --ntasks-per-node=2             # total number of tasks per node
+#SBATCH --gres=gpu:titan_rtx:3   # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti & rtx_a6000
 #SBATCH --cpus-per-task=3               # cpu-cores per task (>1 if multi-threaded tasks)
-#SBATCH --mem-per-cpu=16G               # total memory per node (4 GB per cpu-core is default)
+#SBATCH --mem-per-cpu=32G               # total memory per node (4 GB per cpu-core is default)
 #SBATCH --time=48:00:00                 # total run time limit (HH:MM:SS)
 
 # Exit on errors
@@ -19,15 +19,15 @@ conda activate med
 # The port for communication. Note that if you want to run multiple tasks on the same machine,
 # you need to specify different port numbers.
 export MASTER_PORT=8088
-export CUDA_VISIBLE_DEVICES=0,1,2,
+export CUDA_VISIBLE_DEVICES=0,1,2
 export GPUS_PER_NODE=3
 
 bpe_dir=../../utils/BPE
 user_dir=../../ofa_module
 restore_file=../../checkpoints/ofa_base.pt
-data_dir=../../dataset/pretrain_data
+data_dir=../../dataset/pretrain_data_rad
 neg_sample_dir=${data_dir}/negative_sample
-data=${data_dir}/vision_language_examples.tsv
+data=${data_dir}/vision_language_examples_2.tsv
 text_data=${data_dir}/text_examples.tsv
 image_data=${data_dir}/image_examples.tsv
 detection_data=${data_dir}/detection_examples.tsv
@@ -43,9 +43,9 @@ arch=ofa_base
 criterion=adjust_label_smoothed_cross_entropy
 label_smoothing=0.0
 lr=1e-4
-max_epoch=50
+max_epoch=100
 warmup_ratio=0.01
-batch_size=2
+batch_size=8
 update_freq=1
 resnet_drop_path_rate=0.0
 encoder_drop_path_rate=0.1
@@ -59,16 +59,14 @@ patch_image_size=384
 sample_patch_num=196
 max_image_size=512
 
-save_path=./checkpoints
+save_path=./checkpoints_from_ofa_base
 
 python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_port=${MASTER_PORT} ../../train.py \
   $data \
   --text-data=${text_data} \
-  --image-data=${image_data} \
   --detection-data=${detection_data} \
   --selected-cols=${selected_cols} \
   --text-selected-cols=${text_selected_cols} \
-  --image-selected-cols=${image_selected_cols} \
   --detection-selected-cols=${detection_selected_cols} \
   --bpe-dir=${bpe_dir} \
   --user-dir=${user_dir} \

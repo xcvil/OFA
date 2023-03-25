@@ -15,7 +15,7 @@ import torch
 import base64
 from torchvision import transforms
 
-from PIL import Image, ImageFile
+from PIL import Image, ImageFile, UnidentifiedImageError
 
 from data import data_utils
 from data.ofa_dataset import OFADataset
@@ -211,26 +211,26 @@ class UnifyDataset(OFADataset):
             RandomAugment(2, 7, isPIL=True, augs=['Identity', 'AutoContrast', 'Equalize', 'Brightness', 'Sharpness',
                                                   'ShearX', 'ShearY', 'TranslateX', 'TranslateY', 'Rotate']),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+            transforms.Normalize(mean=[0.476, 0.476, 0.476], std=[0.301, 0.301, 0.301]),
         ])
         # for pure image
         self.patch_crop_transform = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+            transforms.Normalize(mean=[0.476, 0.476, 0.476], std=[0.301, 0.301, 0.301]),
         ])
         # for detection
         self.detection_transform = T.Compose([
             T.RandomHorizontalFlip(),
             T.LargeScaleJitter(output_size=self.code_image_size*2, aug_scale_min=1.0, aug_scale_max=1.5),
             T.ToTensor(),
-            T.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_image_size=max_image_size)
+            T.Normalize(mean=[0.476, 0.476, 0.476], std=[0.301, 0.301, 0.301], max_image_size=max_image_size)
         ])
         # for visual grounding
         self.visual_grounding_transform = T.Compose([
             T.RandomResize(scales, max_size=672),
             T.ObjectCenterCrop((patch_image_size, patch_image_size)),
             T.ToTensor(),
-            T.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_image_size=max_image_size)
+            T.Normalize(mean=[0.476, 0.476, 0.476], std=[0.301, 0.301, 0.301], max_image_size=max_image_size)
         ])
 
     def set_epoch(self, epoch, **unused):
@@ -266,8 +266,11 @@ class UnifyDataset(OFADataset):
 
     def process_image_text_pair(self, index):
         uniq_id, image, caption, question, refs, gt_objects, dataset_name, type = self.dataset[index]
+        try:
+            image = Image.open(BytesIO(base64.urlsafe_b64decode(image))).convert("RGB")
+        except UnidentifiedImageError:
+            print(f'Cannot open sample {uniq_id}')
 
-        image = Image.open(BytesIO(base64.urlsafe_b64decode(image))).convert("RGB")
         patch_image = self.patch_resize_transform(image) if type != 'visual_grounding' else None
         patch_mask = torch.tensor([True])
         conf = torch.tensor([1.0])
@@ -275,10 +278,10 @@ class UnifyDataset(OFADataset):
             tgt_caption = self.pre_caption(caption, self.max_tgt_length)
             pos_src_caption = self.pre_caption(caption, self.max_src_length)
             neg_src_caption = self.pre_caption(self.get_negative_caption(caption, gt_objects), self.max_src_length)
-            src_item = self.encode_text(" what does the image describe?")
+            src_item = self.encode_text(" based on the x-ray image, what report can be generated?")
             tgt_item = self.encode_text(" {}".format(tgt_caption))
-            pos_src_item = self.encode_text(' does the image describe " {} "?'.format(pos_src_caption))
-            neg_src_item = self.encode_text(' does the image describe " {} "?'.format(neg_src_caption))
+            pos_src_item = self.encode_text(' does the x-ray image describe " {} "?'.format(pos_src_caption))
+            neg_src_item = self.encode_text(' does the x-ray image describe " {} "?'.format(neg_src_caption))
         elif type == 'qa':
             question = self.pre_question(question, self.max_src_length)
             ref_dict = {item.split('|!+')[1]: float(item.split('|!+')[0]) for item in refs.split('&&')}
@@ -373,7 +376,7 @@ class UnifyDataset(OFADataset):
             text_item = text_item[-256:]
             text_item = torch.cat([self.bos_item, text_item, self.eos_item])
             mask_text_item = self.add_whole_word_mask(text_item.clone(), self.mask_ratio)
-            prefix_item = self.encode_text(' what is the complete text of " "?')
+            prefix_item = self.encode_text(' what is the complete report of " "?')
             src_item = torch.cat([prefix_item[:-2], mask_text_item[1:-1], prefix_item[-2:]])
             tgt_item = text_item[1:-1]
             src_item = torch.cat([self.bos_item, src_item, self.eos_item])
@@ -469,10 +472,11 @@ class UnifyDataset(OFADataset):
         with data_utils.numpy_seed(self.seed, self.epoch):
             pair_samples = self.process_image_text_pair(index)
             extra_samples = []
-            if self.split == 'train' and self.dataset.data_cnt % 8 == 0:
+            if self.split == 'train' and self.dataset.data_cnt % 2 == 0:
                 extra_samples += self.process_pure_text(0) if self.pure_text_dataset else []
                 extra_samples += self.process_pure_image(0) if self.pure_image_dataset else []
                 extra_samples += self.process_detection(0) if self.detection_dataset else []
+                # print(f'there are {len(extra_samples)} extra samples, id for language task is {extra_samples[0]["id"]}, {extra_samples[1]["id"]}, id for detection task is {extra_samples[2]["id"]}')
         return pair_samples, extra_samples
 
     def word_starts(self, source):
