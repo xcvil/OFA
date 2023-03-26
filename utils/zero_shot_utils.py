@@ -9,6 +9,7 @@ import math
 import torch
 
 from data import data_utils
+from .eval_utils import eval_caption 
 
 
 def get_symbols_to_strip_from_output(generator):
@@ -139,5 +140,7 @@ def zero_shot_step(task, generator, models, sample, **kwargs):
         return eval_refcoco(task, generator, models, sample, **kwargs)
     elif task.cfg._name == 'snli_ve':
         return eval_snli_ve(task, generator, models, sample, **kwargs)
+    elif task.cfg._name == 'caption':
+        return eval_caption(task, generator, models, sample, **kwargs)
     else:
         raise NotImplementedError

@@ -103,8 +103,8 @@ class CaptionDataset(OFADataset):
             mean = IMAGENET_DEFAULT_MEAN
             std = IMAGENET_DEFAULT_STD
         else:
-            mean = [0.5, 0.5, 0.5]
-            std = [0.5, 0.5, 0.5]
+            mean=[0.476, 0.476, 0.476]
+            std=[0.301, 0.301, 0.301]
 
         self.patch_resize_transform = transforms.Compose([
             lambda image: image.convert("RGB"),
@@ -114,7 +114,7 @@ class CaptionDataset(OFADataset):
         ])
 
         if type(bpe).__name__ == 'GPT2BPE':
-            self.prompt = " what does the image describe?"
+            self.prompt = " generate the report for this x-ray image"
         elif type(bpe).__name__ == 'BertBPE':
             self.prompt = "图片描述了什么内容?"
 

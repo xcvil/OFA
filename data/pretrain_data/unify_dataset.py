@@ -278,7 +278,7 @@ class UnifyDataset(OFADataset):
             tgt_caption = self.pre_caption(caption, self.max_tgt_length)
             pos_src_caption = self.pre_caption(caption, self.max_src_length)
             neg_src_caption = self.pre_caption(self.get_negative_caption(caption, gt_objects), self.max_src_length)
-            src_item = self.encode_text(" based on the x-ray image, what report can be generated?")
+            src_item = self.encode_text(" generate a radiology report based on the x-ray image")
             tgt_item = self.encode_text(" {}".format(tgt_caption))
             pos_src_item = self.encode_text(' does the x-ray image describe " {} "?'.format(pos_src_caption))
             neg_src_item = self.encode_text(' does the x-ray image describe " {} "?'.format(neg_src_caption))
@@ -309,10 +309,11 @@ class UnifyDataset(OFADataset):
             quant_y1 = "<bin_{}>".format(int((boxes_target["boxes"][0][3] * (self.num_bins - 1)).round()))
             region_coord = "{} {} {} {}".format(quant_x0, quant_y0, quant_x1, quant_y1)
             src_caption = self.pre_caption(caption, self.max_src_length)
-            src_item = self.encode_text(' which region does the text " {} " describe?'.format(src_caption))
+            src_item = self.encode_text(' which region does the radiology report " {} " describe?'.format(src_caption))
             tgt_item = self.encode_text(region_coord, use_bpe=False)
         else:
             logger.info('type {} is not implemented'.format(type))
+            print(f'sample {uniq_id} type {type} is not implemented')
             raise NotImplementedError
 
         src_item = torch.cat([self.bos_item, src_item, self.eos_item])
@@ -339,7 +340,7 @@ class UnifyDataset(OFADataset):
         prob = random.random()
         if type == 'visual_grounding':
             region_example = example.copy()
-            region_prefix_item = self.encode_text('  what does the region describe? region:')
+            region_prefix_item = self.encode_text('  what does the region describe in a radiology report? region:')
             region_coord_item = self.encode_text('{}'.format(region_coord), use_bpe=False)
             region_src_item = torch.cat([region_prefix_item, region_coord_item])
             region_tgt_item = self.encode_text(' {}'.format(self.pre_caption(caption, self.max_tgt_length)))
@@ -472,7 +473,7 @@ class UnifyDataset(OFADataset):
         with data_utils.numpy_seed(self.seed, self.epoch):
             pair_samples = self.process_image_text_pair(index)
             extra_samples = []
-            if self.split == 'train' and self.dataset.data_cnt % 2 == 0:
+            if self.split == 'train' and self.dataset.data_cnt % 4 == 0:
                 extra_samples += self.process_pure_text(0) if self.pure_text_dataset else []
                 extra_samples += self.process_pure_image(0) if self.pure_image_dataset else []
                 extra_samples += self.process_detection(0) if self.detection_dataset else []

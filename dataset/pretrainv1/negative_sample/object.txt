@@ -1,0 +1,27 @@
+aortic enlargement
+atelectasis
+cardiomegaly
+calcification
+clavicle fracture
+consolidation
+edema
+emphysema
+enlarged pa
+ild
+infiltration
+lung cavity
+lung cyst
+lung opacity
+mediastinal shift
+nodule/mass
+pulmonary fibrosis
+pneumothorax
+pleural thickening
+pleural effusion
+rib fracture
+other lesion
+pneumonia
+enlarged cardiomediastinum
+fracture
+lung lesion
+no finding
