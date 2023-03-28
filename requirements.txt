@@ -7,7 +7,6 @@ pycocoevalcap==1.2
 einops
 datasets
 rouge_score
-soundfile
 editdistance
 librosa
 python-Levenshtein
