@@ -1,19 +1,21 @@
 #!/usr/bin/env
 
+# Exit on errors
+set -o errexit
+
 # The port for communication. Note that if you want to run multiple tasks on the same machine,
 # you need to specify different port numbers.
-export MASTER_PORT=1066
-export CUDA_VISIBLE_DEVICES=0,1,
-export GPUS_PER_NODE=2
+export MASTER_PORT=9061
+export CUDA_VISIBLE_DEVICES=0,1,2
+export GPUS_PER_NODE=3
 
 bpe_dir=../../utils/BPE
 user_dir=../../ofa_module
 restore_file=../../checkpoints/ofa_base.pt
-data_dir=../../dataset/pretrain_data_rad
+data_dir=../../dataset/pretrainv1
 neg_sample_dir=${data_dir}/negative_sample
-data=${data_dir}/vision_language_examples_new.tsv
+data=${data_dir}/vision_language_examples.tsv
 text_data=${data_dir}/text_examples.tsv
-image_data=${data_dir}/image_examples.tsv
 detection_data=${data_dir}/detection_examples.tsv
 
 selected_cols=0,1,2,3,4,5,6,7
@@ -27,9 +29,9 @@ arch=ofa_base
 criterion=adjust_label_smoothed_cross_entropy
 label_smoothing=0.0
 lr=1e-4
-max_epoch=50
+max_epoch=300
 warmup_ratio=0.01
-batch_size=32
+batch_size=8
 update_freq=1
 resnet_drop_path_rate=0.0
 encoder_drop_path_rate=0.1
@@ -43,9 +45,9 @@ patch_image_size=384
 sample_patch_num=196
 max_image_size=512
 
-save_path=./checkpoints
+save_path=./base-3090-8
 
-python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_port=${MASTER_PORT} ../../train.py \
+python -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_port=${MASTER_PORT} ../../train.py \
   $data \
   --text-data=${text_data} \
   --detection-data=${detection_data} \
@@ -100,3 +102,9 @@ python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_p
   --fp16-scale-window=128 \
   --num-workers=0 \
   --ddp-backend=no_c10d \
+
+# Send more noteworthy information to the output log
+echo "Finished at:     $(date)"
+
+# End the script with exit code 0
+exit 0
