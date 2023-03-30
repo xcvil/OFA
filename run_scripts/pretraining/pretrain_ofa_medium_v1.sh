@@ -12,7 +12,7 @@
 # Exit on errors
 set -o errexit
 
-source ~/.bashrc.xzheng
+source ~/.bashrc.zhmeng
 conda activate med
 
 # The port for communication. Note that if you want to run multiple tasks on the same machine,
@@ -57,7 +57,7 @@ patch_image_size=384
 sample_patch_num=196
 max_image_size=512
 
-save_path=./medium-rtx3090-8-16-pe4
+save_path=./medium-pretrain
 
 python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_port=${MASTER_PORT} ../../train.py \
   $data \

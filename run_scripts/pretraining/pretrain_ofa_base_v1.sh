@@ -1,25 +1,25 @@
 #!/bin/bash
-#SBATCH --output=output_%J.txt
-#SBATCH --error=log_%j.txt
+#SBATCH --mail-type=FAIL                # mail configuration: NONE, BEGIN, END, FAIL, REQUEUE, ALL
+#SBATCH --output=output_%j.out
+#SBATCH --error=log_%j.err
 #SBATCH --job-name=mod_tra              # create a short name for your job
-#SBATCH --partition=gpu
 #SBATCH --nodes=1                       # node count
-#SBATCH --gres=gpu:rtx3090:3            # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti & rtx_a6000
+#SBATCH --gres=gpu:geforce_rtx_3090:8   # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti & rtx_a6000
 #SBATCH --cpus-per-task=3               # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=32G               # total memory per node (4 GB per cpu-core is default)
-#SBATCH --time=48:00:00                 # total run time limit (HH:MM:SS)
+#SBATCH --time=24:00:00                 # total run time limit (HH:MM:SS)
 
-# Send more noteworthy information to the output log
-echo "Started at:     $(date)"
+# Exit on errors
+set -o errexit
 
-source ~/anaconda3/etc/profile.d/conda.sh
+source ~/.bashrc.zhmeng
 conda activate med
 
 # The port for communication. Note that if you want to run multiple tasks on the same machine,
 # you need to specify different port numbers.
 export MASTER_PORT=9061
-export CUDA_VISIBLE_DEVICES=0,1,2,
-export GPUS_PER_NODE=3
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export GPUS_PER_NODE=8
 
 bpe_dir=../../utils/BPE
 user_dir=../../ofa_module
@@ -57,7 +57,7 @@ patch_image_size=384
 sample_patch_num=196
 max_image_size=512
 
-save_path=./leomed-base-3090-3-8
+save_path=./base-pretrain
 
 python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_port=${MASTER_PORT} ../../train.py \
   $data \
