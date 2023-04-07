@@ -16,7 +16,7 @@ source ~/.bashrc
 source ~/.bashrc.xzheng
 conda activate base
 
-python test.py
+python ./test.py
 
 # Send more noteworthy information to the output log
 echo "Finished at:     $(date)"
