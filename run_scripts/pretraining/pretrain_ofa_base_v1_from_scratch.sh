@@ -7,7 +7,7 @@
 #SBATCH --gres=gpu:rtx3090:8            # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti & rtx_a6000
 #SBATCH --cpus-per-task=3               # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=32G               # total memory per node (4 GB per cpu-core is default)
-#SBATCH --time=48:00:00                 # total run time limit (HH:MM:SS)
+#SBATCH --time=56:00:00                 # total run time limit (HH:MM:SS)
 
 # Send more noteworthy information to the output log
 echo "Started at:     $(date)"
@@ -24,7 +24,6 @@ export GPUS_PER_NODE=8
 
 bpe_dir=/cluster/customapps/medinfmk/xiaochen/OFA/utils/BPE
 user_dir=/cluster/customapps/medinfmk/xiaochen/OFA/ofa_module
-restore_file=/cluster/customapps/medinfmk/xiaochen/OFA/checkpoints/ofa_base.pt
 data_dir=/cluster/work/medinfmk/MedVLM/dataset/ofa-pretrain-v1
 neg_sample_dir=${data_dir}/negative_sample
 data=${data_dir}/vision_language_examples.tsv
@@ -69,7 +68,6 @@ python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_p
   --detection-selected-cols=${detection_selected_cols} \
   --bpe-dir=${bpe_dir} \
   --user-dir=${user_dir} \
-  --restore-file=${restore_file} \
   --reset-optimizer --reset-dataloader --reset-meters \
   --save-dir=${save_path} \
   --neg-sample-dir=${neg_sample_dir} \
