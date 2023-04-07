@@ -58,7 +58,7 @@ patch_image_size=384
 sample_patch_num=196
 max_image_size=512
 
-save_path=./leomed-base-1080-8-4
+save_path=/cluster/work/medinfmk/MedVLM/ckpt/leomed-base-1080-8-4
 
 python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_port=${MASTER_PORT} /cluster/customapps/medinfmk/xiaochen/OFA/train.py \
   $data \
