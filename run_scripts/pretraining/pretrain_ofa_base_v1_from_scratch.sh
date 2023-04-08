@@ -7,7 +7,7 @@
 #SBATCH --gres=gpu:rtx1080ti:8          # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti & rtx_a6000
 #SBATCH --cpus-per-task=3               # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=32G               # total memory per node (4 GB per cpu-core is default)
-#SBATCH --time=96:00:00                 # total run time limit (HH:MM:SS)
+#SBATCH --time=128:00:00                 # total run time limit (HH:MM:SS)
 
 # Send more noteworthy information to the output log
 echo "Started at:     $(date)"
@@ -18,7 +18,7 @@ conda activate med
 
 # The port for communication. Note that if you want to run multiple tasks on the same machine,
 # you need to specify different port numbers.
-export MASTER_PORT=9062
+export MASTER_PORT=9068
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 
 export GPUS_PER_NODE=8
 
@@ -50,8 +50,8 @@ encoder_drop_path_rate=0.1
 decoder_drop_path_rate=0.1
 dropout=0.1
 attention_dropout=0.0
-max_src_length=80
-max_tgt_length=30
+max_src_length=128
+max_tgt_length=128
 num_bins=1000
 patch_image_size=384
 sample_patch_num=196

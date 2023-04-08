@@ -51,8 +51,8 @@ encoder_drop_path_rate=0.1
 decoder_drop_path_rate=0.1
 dropout=0.1
 attention_dropout=0.0
-max_src_length=80
-max_tgt_length=30
+max_src_length=128
+max_tgt_length=128
 num_bins=1000
 patch_image_size=384
 sample_patch_num=196
@@ -70,7 +70,7 @@ python3 -m torch.distributed.launch --nproc_per_node=${GPUS_PER_NODE} --master_p
   --bpe-dir=${bpe_dir} \
   --user-dir=${user_dir} \
   --restore-file=${restore_file} \
-  --reset-optimizer --reset-dataloader --reset-meters \
+  --reset-dataloader --reset-meters \
   --save-dir=${save_path} \
   --neg-sample-dir=${neg_sample_dir} \
   --task=${task} \
