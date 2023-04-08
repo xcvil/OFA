@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --output=/cluster/work/medinfmk/MedVLM/output/output_%J.txt
 #SBATCH --error=/cluster/work/medinfmk/MedVLM/error/error_%j.txt
-#SBATCH --job-name=mod_tra              # create a short name for your job
+#SBATCH --job-name=tik                  # create a short name for your job
 #SBATCH --partition=gpu
 #SBATCH --nodes=1                       # node count
 #SBATCH --gres=gpu:rtx1080ti:8            # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti & rtx_a6000
 #SBATCH --cpus-per-task=3               # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=32G               # total memory per node (4 GB per cpu-core is default)
-#SBATCH --time=48:00:00                 # total run time limit (HH:MM:SS)
+#SBATCH --time=56:00:00                 # total run time limit (HH:MM:SS)
 
 # Send more noteworthy information to the output log
 echo "Started at:     $(date)"
@@ -18,13 +18,13 @@ conda activate med
 
 # The port for communication. Note that if you want to run multiple tasks on the same machine,
 # you need to specify different port numbers.
-export MASTER_PORT=9061
+export MASTER_PORT=9039
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 
 export GPUS_PER_NODE=8
 
 bpe_dir=/cluster/customapps/medinfmk/xiaochen/OFA/utils/BPE
 user_dir=/cluster/customapps/medinfmk/xiaochen/OFA/ofa_module
-restore_file=/cluster/customapps/medinfmk/xiaochen/OFA/checkpoints/ofa_base.pt
+restore_file=/cluster/customapps/medinfmk/xiaochen/OFA/checkpoints/a6000-base-55.pt
 data_dir=/cluster/work/medinfmk/MedVLM/dataset/ofa-pretrain-v1
 neg_sample_dir=${data_dir}/negative_sample
 data=${data_dir}/vision_language_examples.tsv
