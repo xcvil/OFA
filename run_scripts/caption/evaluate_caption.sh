@@ -9,7 +9,7 @@
 #SBATCH --time=18:00:00                 # total run time limit (HH:MM:SS)
 
 # Exit on errors
-set -o errexit
+echo "Started at:     $(date)"
 
 source ~/.bashrc
 source ~/.bashrc.xzheng
