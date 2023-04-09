@@ -2,6 +2,7 @@
 #SBATCH --output=/cluster/work/medinfmk/MedVLM/output/output_%J.txt
 #SBATCH --error=/cluster/work/medinfmk/MedVLM/error/error_%j.txt
 #SBATCH --job-name=eval              # create a short name for your job
+#SBATCH --partition=gpu
 #SBATCH --nodes=1                       # node count
 #SBATCH --gres=gpu:rtx1080ti:1               # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=16G               # total memory per node (4 GB per cpu-core is default)
