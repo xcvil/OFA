@@ -36,6 +36,7 @@ CUDA_VISIBLE_DEVICES=0 python3 /cluster/customapps/medinfmk/xiaochen/OFA/evaluat
     --bpe-dir=${bpe_dir} \
     --task=caption \
     --batch-size=16 \
+    --max_tgt_length=80 \
     --log-format=simple --log-interval=10 \
     --seed=7 \
     --gen-subset=${split} \
@@ -48,7 +49,7 @@ CUDA_VISIBLE_DEVICES=0 python3 /cluster/customapps/medinfmk/xiaochen/OFA/evaluat
     --zero-shot \
     --model-overrides="{\"data\":\"${data}\",\"bpe_dir\":\"${bpe_dir}\",\"eval_cider\":False,\"selected_cols\":\"${selected_cols}\"}"
 
-python coco_eval.py ../../results/caption/test_predict.json ../../dataset/caption_data/test_caption_coco_format.json
+python /cluster/customapps/medinfmk/xiaochen/OFA/coco_eval.py /cluster/work/medinfmk/MedVLM/results/caption/test_predict.json /cluster/work/medinfmk/MedVLM/dataset/caption_data/test_caption_coco_format.json
 
 # Send more noteworthy information to the output log
 echo "Finished at:     $(date)"
