@@ -36,7 +36,7 @@ CUDA_VISIBLE_DEVICES=0 python3 /cluster/customapps/medinfmk/xiaochen/OFA/evaluat
     --bpe-dir=${bpe_dir} \
     --task=caption \
     --batch-size=16 \
-    --max_tgt_length=80 \
+    --max-tgt-length=80 \
     --log-format=simple --log-interval=10 \
     --seed=7 \
     --gen-subset=${split} \
