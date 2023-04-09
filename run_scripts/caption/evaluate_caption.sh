@@ -5,7 +5,7 @@
 #SBATCH --nodes=1                       # node count
 #SBATCH --gres=gpu:1   # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti & rtx_a6000
 #SBATCH --gres=gpu:rtx1080ti:1               # cpu-cores per task (>1 if multi-threaded tasks)
-#SBATCH --mem-per-cpu=24G               # total memory per node (4 GB per cpu-core is default)
+#SBATCH --mem-per-cpu=16G               # total memory per node (4 GB per cpu-core is default)
 #SBATCH --time=18:00:00                 # total run time limit (HH:MM:SS)
 
 # Exit on errors
