@@ -1,8 +1,7 @@
 #!/bin/bash
-#SBATCH --mail-type=FAIL                # mail configuration: NONE, BEGIN, END, FAIL, REQUEUE, ALL
-#SBATCH --output=output/%j.out
-#SBATCH --error=log/%j.err
-#SBATCH --job-name=mod_tra              # create a short name for your job
+#SBATCH --output=/cluster/work/medinfmk/MedVLM/output/output_%J.txt
+#SBATCH --error=/cluster/work/medinfmk/MedVLM/error/error_%j.txt
+#SBATCH --job-name=eval              # create a short name for your job
 #SBATCH --nodes=1                       # node count
 #SBATCH --gres=gpu:1   # titan_rtx & geforce_rtx_3090 & tesla_v100 & geforce_rtx_2080_ti & rtx_a6000
 #SBATCH --cpus-per-task=3               # cpu-cores per task (>1 if multi-threaded tasks)
@@ -19,16 +18,16 @@ conda activate med
 # you need to specify different port numbers.
 export MASTER_PORT=1081
 
-user_dir=../../ofa_module
-bpe_dir=../../utils/BPE
+bpe_dir=/cluster/customapps/medinfmk/xiaochen/OFA/utils/BPE
+user_dir=/cluster/customapps/medinfmk/xiaochen/OFA/ofa_module
 
-data=../../dataset/caption_data/caption_test.tsv
-path=../../checkpoints/caption_base_best.pt
-result_path=../../results/caption
+data=/cluster/work/medinfmk/MedVLM/dataset/caption_data/caption_test.tsv
+path=/cluster/work/medinfmk/MedVLM/ckpt/leomed-medium-1080-4x4x8-from-tik/checkpoint45.pt
+result_path=/cluster/work/medinfmk/MedVLM/results/caption
 selected_cols=1,4,2
 split='test'
 
-CUDA_VISIBLE_DEVICES=0 python3 ../../evaluate.py \
+CUDA_VISIBLE_DEVICES=0 python3 /cluster/customapps/medinfmk/xiaochen/OFA/evaluate.py \
     ${data} \
     --path=${path} \
     --user-dir=${user_dir} \
