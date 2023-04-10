@@ -42,7 +42,7 @@ CUDA_VISIBLE_DEVICES=0 python3 /cluster/customapps/medinfmk/xiaochen/OFA/evaluat
     --gen-subset=${split} \
     --results-path=${result_path} \
     --beam=5 \
-    --max-len-b=16 \
+    --max-len-b=128 \
     --no-repeat-ngram-size=3 \
     --fp16 \
     --num-workers=0 \
