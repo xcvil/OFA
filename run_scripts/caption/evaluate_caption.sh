@@ -38,18 +38,16 @@ CUDA_VISIBLE_DEVICES=0 python3 /cluster/customapps/medinfmk/xiaochen/OFA/evaluat
     --batch-size=16 \
     --max-tgt-length=80 \
     --log-format=simple --log-interval=10 \
-    --seed=7 \
+    --seed=33 \
     --gen-subset=${split} \
     --results-path=${result_path} \
     --beam=5 \
-    --max-len-b=72 \
+    --max-len-b=16 \
     --no-repeat-ngram-size=3 \
     --fp16 \
     --num-workers=0 \
     --zero-shot \
     --model-overrides="{\"data\":\"${data}\",\"bpe_dir\":\"${bpe_dir}\",\"eval_cider\":False,\"selected_cols\":\"${selected_cols}\"}"
-
-python /cluster/customapps/medinfmk/xiaochen/OFA/coco_eval.py /cluster/work/medinfmk/MedVLM/results/caption/test_predict.json /cluster/work/medinfmk/MedVLM/dataset/caption_data/test_caption_coco_format.json
 
 # Send more noteworthy information to the output log
 echo "Finished at:     $(date)"
