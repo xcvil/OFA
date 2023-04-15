@@ -23,7 +23,7 @@ bpe_dir=/cluster/customapps/medinfmk/xiaochen/OFA/utils/BPE
 user_dir=/cluster/customapps/medinfmk/xiaochen/OFA/ofa_module
 
 data=/cluster/work/medinfmk/MedVLM/dataset/caption_data/caption_test.tsv
-path=/cluster/work/medinfmk/MedVLM/ckpt/leomed-medium-1080-4x4x8-from-tik/checkpoint45.pt
+path=/cluster/work/medinfmk/MedVLM/ckpt/leomed-base-3090-4x8x2-from-scratch/checkpoint_52_12000.pt
 result_path=/cluster/work/medinfmk/MedVLM/results/caption
 selected_cols=1,4,2
 split='test'
